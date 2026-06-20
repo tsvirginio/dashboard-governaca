@@ -6,55 +6,43 @@
 <title>Governança Federada — Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  /* ── reset & base ── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #F0F4F8;
-    color: #1E293B;
-    min-height: 100vh;
-    /* REMOVE BORDA DO SHAREPOINT */
-    margin: 0 !important;
-    padding: 0 !important;
+    background: #F0F4F8; color: #1E293B; min-height: 100vh;
+    margin: 0 !important; padding: 0 !important;
   }
-
-  /* ── sidebar ── */
   .layout { display: flex; min-height: 100vh; }
   .sidebar {
-    width: 220px; min-width: 220px;
-    background: #0F1E35;
+    width: 220px; min-width: 220px; background: #0F1E35;
     display: flex; flex-direction: column;
     position: fixed; top: 0; left: 0; bottom: 0;
-    z-index: 100; overflow-y: auto;
-    transition: transform 0.3s;
+    z-index: 100; overflow-y: auto; transition: transform 0.3s;
   }
   .sidebar-logo {
-    padding: 20px 18px 16px;
-    border-bottom: 1px solid #243347;
+    padding: 20px 18px 16px; border-bottom: 1px solid #243347;
     display: flex; align-items: center; gap: 10px;
   }
   .logo-icon {
-    width: 36px; height: 36px; background: #2563EB;
-    border-radius: 8px; display: flex; align-items: center;
-    justify-content: center; font-size: 18px; flex-shrink: 0;
+    width: 36px; height: 36px; background: #2563EB; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
   }
   .logo-text {
     font-size: 11px; font-weight: 700; color: #fff;
     text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4;
   }
-  .nav-section {
-    padding: 12px 0; flex: 1;
-  }
+  .nav-section { padding: 12px 0; flex: 1; }
   .nav-label {
     padding: 6px 18px; font-size: 9px; font-weight: 700;
     color: #475569; text-transform: uppercase; letter-spacing: 1.5px;
   }
   .nav-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 18px; font-size: 12.5px; cursor: pointer;
-    color: #94A3B8; border-left: 3px solid transparent;
-    transition: all 0.15s; text-decoration: none;
-    background: transparent; border-right: none; border-top: none; border-bottom: none;
+    display: flex; align-items: center; gap: 10px; padding: 10px 18px;
+    font-size: 12.5px; cursor: pointer; color: #94A3B8;
+    border-left: 3px solid transparent; transition: all 0.15s;
+    text-decoration: none; background: transparent;
+    border-right: none; border-top: none; border-bottom: none;
     width: 100%; text-align: left;
   }
   .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
@@ -67,15 +55,9 @@
     padding: 14px 18px; border-top: 1px solid #243347;
     font-size: 10px; color: #475569; line-height: 1.6;
   }
-
-  /* ── main ── */
-  .main {
-    margin-left: 220px; flex: 1;
-    display: flex; flex-direction: column; min-height: 100vh;
-  }
+  .main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
   .topbar {
-    background: #fff; padding: 14px 28px;
-    border-bottom: 1px solid #E2E8F0;
+    background: #fff; padding: 14px 28px; border-bottom: 1px solid #E2E8F0;
     display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 10px; position: sticky; top: 0; z-index: 50;
   }
@@ -83,23 +65,21 @@
   .topbar-sub { font-size: 11px; color: #64748B; margin-top: 2px; }
   .topbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .badge-update {
-    font-size: 10px; color: #64748B;
-    background: #F1F5F9; padding: 5px 12px; border-radius: 20px;
-    border: 1px solid #E2E8F0;
+    font-size: 10px; color: #64748B; background: #F1F5F9;
+    padding: 5px 12px; border-radius: 20px; border: 1px solid #E2E8F0;
+  }
+  .badge-source {
+    font-size: 10px; color: #16A34A; background: #DCFCE7;
+    padding: 5px 12px; border-radius: 20px; border: 1px solid #BBF7D0; font-weight:700;
   }
   .filter-select {
     font-size: 11px; padding: 5px 10px; border: 1px solid #E2E8F0;
     border-radius: 8px; background: #F8FAFC; color: #1E293B; cursor: pointer;
   }
-
-  /* ── pages ── */
   .page { display: none; padding: 24px 28px; }
   .page.active { display: block; }
-
-  /* ── KPI cards ── */
   .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     gap: 14px; margin-bottom: 24px;
   }
   .kpi-card {
@@ -115,31 +95,22 @@
   .kpi-amber { color: #D97706; }
   .kpi-red   { color: #DC2626; }
   .kpi-blue  { color: #2563EB; }
-
-  /* ── charts grid ── */
-  .charts-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;
-  }
-  .charts-grid-3 {
-    display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 24px;
-  }
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .charts-grid-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
   .chart-card {
     background: #fff; border-radius: 12px; padding: 20px;
     border: 1px solid #E2E8F0; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
   }
   .chart-card.full { grid-column: 1 / -1; }
   .chart-title {
-    font-size: 12px; font-weight: 700; color: #0F1E35;
-    margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; font-weight: 700; color: #0F1E35; margin-bottom: 14px;
+    display: flex; justify-content: space-between; align-items: center;
   }
   .chart-title span { font-size: 10px; font-weight: 400; color: #64748B; }
   canvas { max-height: 220px; }
-
-  /* ── table ── */
   .table-card {
-    background: #fff; border-radius: 12px;
-    border: 1px solid #E2E8F0; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    overflow: hidden; margin-bottom: 24px;
+    background: #fff; border-radius: 12px; border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 24px;
   }
   .table-header {
     padding: 16px 20px; display: flex; justify-content: space-between;
@@ -166,8 +137,6 @@
     padding: 10px 20px; font-size: 10px; color: #64748B;
     border-top: 1px solid #F1F5F9; background: #FAFAFA;
   }
-
-  /* ── status badges ── */
   .badge {
     display: inline-block; padding: 2px 10px; border-radius: 20px;
     font-size: 10px; font-weight: 700; white-space: nowrap;
@@ -177,30 +146,10 @@
   .badge-red    { background: #FEE2E2; color: #DC2626; }
   .badge-blue   { background: #DBEAFE; color: #2563EB; }
   .badge-gray   { background: #F1F5F9; color: #64748B; }
-
-  /* ── score bar ── */
   .score-bar-wrap { width: 80px; display: inline-block; vertical-align: middle; }
   .score-bar-bg { height: 6px; background: #E2E8F0; border-radius: 3px; overflow: hidden; }
   .score-bar-fill { height: 100%; border-radius: 3px; }
-
-  /* ── section title ── */
-  .sec-title {
-    font-size: 11px; font-weight: 800; color: #fff;
-    padding: 8px 16px; border-radius: 8px 8px 0 0; margin-bottom: 0;
-  }
-
-  /* ── detail panel ── */
-  .detail-grid {
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 20px;
-  }
-  .detail-kpi {
-    background: #F8FAFC; border-radius: 10px; padding: 14px 16px;
-    border: 1px solid #E2E8F0;
-  }
-  .detail-kpi-label { font-size: 10px; color: #64748B; margin-bottom: 4px; }
-  .detail-kpi-value { font-size: 22px; font-weight: 800; color: #0F1E35; }
-
-  /* ── mobile toggle ── */
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 20px; }
   .sidebar-toggle {
     display: none; position: fixed; top: 14px; left: 14px; z-index: 200;
     background: #2563EB; color: #fff; border: none; border-radius: 8px;
@@ -221,7 +170,6 @@
 <button class="sidebar-toggle" onclick="toggleSidebar()" title="Menu">☰</button>
 
 <div class="layout">
-  <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">🛡️</div>
@@ -229,42 +177,29 @@
     </div>
     <nav class="nav-section">
       <div class="nav-label">Principal</div>
-      <button class="nav-item active" onclick="goTo('visao-geral', this)">
-        <span class="nav-icon">📊</span> Visão Geral
-      </button>
-      <button class="nav-item" onclick="goTo('sistemas', this)">
-        <span class="nav-icon">🗄️</span> Sistemas
-      </button>
-      <button class="nav-item" onclick="goTo('retencao', this)">
-        <span class="nav-icon">🗃️</span> Retenção e Expurgo
-      </button>
-      <button class="nav-item" onclick="goTo('conformidade', this)">
-        <span class="nav-icon">✅</span> Conformidade
-      </button>
+      <button class="nav-item active" onclick="goTo('visao-geral', this)"><span class="nav-icon">📊</span> Visão Geral</button>
+      <button class="nav-item" onclick="goTo('sistemas', this)"><span class="nav-icon">🗄️</span> Sistemas</button>
+      <button class="nav-item" onclick="goTo('retencao', this)"><span class="nav-icon">🗃️</span> Retenção e Expurgo</button>
+      <button class="nav-item" onclick="goTo('conformidade', this)"><span class="nav-icon">✅</span> Conformidade</button>
       <div class="nav-label" style="margin-top:10px">Análise</div>
-      <button class="nav-item" onclick="goTo('dominios', this)">
-        <span class="nav-icon">🏛️</span> Por Domínio
-      </button>
-      <button class="nav-item" onclick="goTo('evolucao', this)">
-        <span class="nav-icon">📈</span> Evolução
-      </button>
+      <button class="nav-item" onclick="goTo('dominios', this)"><span class="nav-icon">🏛️</span> Por Domínio</button>
+      <button class="nav-item" onclick="goTo('evolucao', this)"><span class="nav-icon">📈</span> Evolução</button>
     </nav>
     <div class="sidebar-footer">
-      Atualizado em<br><strong style="color:#94A3B8">17/06/2026 22:45</strong>
+      Fonte: Databricks SQL<br><strong style="color:#94A3B8">20/06/2026 23:21</strong>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <div class="main">
     <div class="topbar">
       <div>
         <div class="topbar-title">Indicadores de Governança Federada</div>
-        <div class="topbar-sub">Ambiente transacional · 15 sistemas monitorados</div>
+        <div class="topbar-sub">Ambiente transacional · 8 sistemas monitorados</div>
       </div>
       <div class="topbar-right">
         <select class="filter-select" id="filterDominio" onchange="filterTable()">
           <option value="">Todos os domínios</option>
-          <option value="Financeiro">Financeiro</option><option value="Comercial">Comercial</option><option value="Operações">Operações</option><option value="RH">RH</option><option value="Analytics">Analytics</option><option value="Marketing">Marketing</option><option value="Jurídico">Jurídico</option>
+          <option value="Analytics">Analytics</option><option value="Comercial">Comercial</option><option value="Financeiro">Financeiro</option><option value="Operações">Operações</option><option value="RH">RH</option>
         </select>
         <select class="filter-select" id="filterStatus" onchange="filterTable()">
           <option value="">Todos os status</option>
@@ -272,18 +207,17 @@
           <option value="Parcial">Parcial</option>
           <option value="Não Conforme">Não Conforme</option>
         </select>
-        <span class="badge-update">🔄 17/06/2026 22:45</span>
+        <span class="badge-source">🟢 Databricks SQL</span>
+        <span class="badge-update">🔄 20/06/2026 23:21</span>
       </div>
     </div>
 
-    <!-- PAGE: VISÃO GERAL -->
     <div class="page active" id="page-visao-geral">
-
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-icon">📊</div>
           <div class="kpi-label">Índice Geral de Governança</div>
-          <div class="kpi-value">75.9%</div>
+          <div class="kpi-value">76.9%</div>
           <div class="kpi-sub kpi-amber">
             REGULAR ↗
           </div>
@@ -291,32 +225,32 @@
         <div class="kpi-card">
           <div class="kpi-icon">🗄️</div>
           <div class="kpi-label">Sistemas Monitorados</div>
-          <div class="kpi-value">15</div>
-          <div class="kpi-sub kpi-green">6 conformes</div>
+          <div class="kpi-value">8</div>
+          <div class="kpi-sub kpi-green">3 conformes</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-icon">👤</div>
           <div class="kpi-label">Com Data Owner</div>
           <div class="kpi-value">100%</div>
-          <div class="kpi-sub kpi-blue">15 de 15</div>
+          <div class="kpi-sub kpi-blue">8 de 8</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-icon">📂</div>
           <div class="kpi-label">Metadados Completos</div>
-          <div class="kpi-value">85.2%</div>
-          <div class="kpi-sub kpi-green">média por sistema</div>
+          <div class="kpi-value">75.1%</div>
+          <div class="kpi-sub kpi-amber">média por sistema</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-icon">🗃️</div>
           <div class="kpi-label">Dentro da Política Ret.</div>
-          <div class="kpi-value">82.3%</div>
-          <div class="kpi-sub kpi-green">média por sistema</div>
+          <div class="kpi-value">79.9%</div>
+          <div class="kpi-sub kpi-amber">média por sistema</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-icon">⚠️</div>
           <div class="kpi-label">Não Conformidades</div>
-          <div class="kpi-value">9</div>
-          <div class="kpi-sub kpi-red">2 sistemas críticos</div>
+          <div class="kpi-value">13</div>
+          <div class="kpi-sub kpi-red">1 sistemas críticos</div>
         </div>
       </div>
 
@@ -339,24 +273,20 @@
         <div class="chart-title">Score por Domínio <span>média dos sistemas</span></div>
         <canvas id="chartDominio" style="max-height:180px"></canvas>
       </div>
-
     </div>
 
-    <!-- PAGE: SISTEMAS -->
     <div class="page" id="page-sistemas">
       <div class="table-card">
         <div class="table-header">
           <div class="table-title">📋 Todos os Sistemas — Visão Consolidada</div>
-          <input class="search-box" type="text" id="searchInput"
-            placeholder="🔍 Buscar sistema..." oninput="filterTable()">
+          <input class="search-box" type="text" id="searchInput" placeholder="🔍 Buscar sistema..." oninput="filterTable()">
         </div>
         <div class="table-wrap">
           <table id="mainTable">
             <thead>
               <tr>
-                <th>Sistema</th><th>Tipo</th><th>Domínio</th>
-                <th>Data Owner</th><th>Score Gov.</th>
-                <th>Metadados</th><th>Retenção</th>
+                <th>Sistema</th><th>Tipo</th><th>Domínio</th><th>Data Owner</th>
+                <th>Score Gov.</th><th>Metadados</th><th>Retenção</th>
                 <th>NCs</th><th>Conformidade</th><th>Última Revisão</th>
               </tr>
             </thead>
@@ -367,62 +297,33 @@
       </div>
     </div>
 
-    <!-- PAGE: RETENÇÃO -->
     <div class="page" id="page-retencao">
       <div class="kpi-grid" style="grid-template-columns: repeat(4,1fr)">
-        <div class="kpi-card">
-          <div class="kpi-icon">✅</div>
-          <div class="kpi-label">Dentro da Política</div>
-          <div class="kpi-value">12</div>
-          <div class="kpi-sub kpi-green">sistemas</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon">📦</div>
-          <div class="kpi-label">Revisão Pendente</div>
-          <div class="kpi-value">3</div>
-          <div class="kpi-sub kpi-amber">sistemas</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon">🚨</div>
-          <div class="kpi-label">Política Vencida</div>
-          <div class="kpi-value">0</div>
-          <div class="kpi-sub kpi-red">sistemas</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon">📊</div>
-          <div class="kpi-label">Média Conformidade</div>
-          <div class="kpi-value">82.3%</div>
-          <div class="kpi-sub kpi-blue">geral</div>
-        </div>
+        <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-label">Dentro da Política</div><div class="kpi-value">6</div><div class="kpi-sub kpi-green">sistemas</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-label">Revisão Pendente</div><div class="kpi-value">2</div><div class="kpi-sub kpi-amber">sistemas</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🚨</div><div class="kpi-label">Política Vencida</div><div class="kpi-value">0</div><div class="kpi-sub kpi-red">sistemas</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📊</div><div class="kpi-label">Média Conformidade</div><div class="kpi-value">79.9%</div><div class="kpi-sub kpi-blue">geral</div></div>
       </div>
       <div class="table-card">
-        <div class="table-header">
-          <div class="table-title">🗃️ Retenção e Expurgo por Sistema</div>
-        </div>
+        <div class="table-header"><div class="table-title">🗃️ Retenção e Expurgo por Sistema</div></div>
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>Sistema</th><th>Domínio</th><th>Criticidade</th>
-                <th>% Dentro Política</th><th>Status Retenção</th>
-                <th>Responsável</th><th>Última Revisão</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Sistema</th><th>Domínio</th><th>Criticidade</th><th>% Dentro Política</th><th>Status Retenção</th><th>Responsável</th><th>Última Revisão</th></tr></thead>
             <tbody>
               
               <tr>
-                <td>SAP ERP Central</td>
-                <td>Financeiro</td>
-                <td><span class="badge badge-red">Alta</span></td>
+                <td>BI Tableau Server</td>
+                <td>Analytics</td>
+                <td><span class="badge badge-amber">Média</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:92.6%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">92.6%</span>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:77.0%;background:#D97706"></div></div></div>
+                    <span style="font-size:11px;font-weight:700;color:#D97706">77.0%</span>
                   </div>
                 </td>
                 <td><span class="badge badge-green">Ativo</span></td>
-                <td>Ana Lima</td>
-                <td>16/05/2026</td>
+                <td>Roberto Silva</td>
+                <td>13/06/2026</td>
               </tr>
               <tr>
                 <td>CRM Salesforce</td>
@@ -430,55 +331,13 @@
                 <td><span class="badge badge-red">Alta</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:81.7%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">81.7%</span>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:86.3%;background:#16A34A"></div></div></div>
+                    <span style="font-size:11px;font-weight:700;color:#16A34A">86.3%</span>
                   </div>
                 </td>
                 <td><span class="badge badge-green">Ativo</span></td>
                 <td>Carlos Mendes</td>
-                <td>08/04/2026</td>
-              </tr>
-              <tr>
-                <td>WMS LogísticaPro</td>
-                <td>Operações</td>
-                <td><span class="badge badge-red">Alta</span></td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:80.5%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">80.5%</span>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">Ativo</span></td>
-                <td>Pedro Alves</td>
-                <td>05/06/2026</td>
-              </tr>
-              <tr>
-                <td>MES Produção</td>
-                <td>Operações</td>
-                <td><span class="badge badge-red">Alta</span></td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:90.2%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">90.2%</span>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">Ativo</span></td>
-                <td>Pedro Alves</td>
-                <td>06/04/2026</td>
-              </tr>
-              <tr>
-                <td>SuccessFactors RH</td>
-                <td>RH</td>
-                <td><span class="badge badge-red">Alta</span></td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:91.9%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">91.9%</span>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">Ativo</span></td>
-                <td>Camila Rocha</td>
-                <td>24/04/2026</td>
+                <td>13/06/2026</td>
               </tr>
               <tr>
                 <td>E-commerce Platform</td>
@@ -486,13 +345,13 @@
                 <td><span class="badge badge-red">Alta</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:84.7%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">84.7%</span>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:69.0%;background:#D97706"></div></div></div>
+                    <span style="font-size:11px;font-weight:700;color:#D97706">69.0%</span>
                   </div>
                 </td>
-                <td><span class="badge badge-green">Ativo</span></td>
+                <td><span class="badge badge-amber">Revisão Pendente</span></td>
                 <td>Bruno Mendes</td>
-                <td>16/06/2026</td>
+                <td>13/06/2026</td>
               </tr>
               <tr>
                 <td>Legado Fiscal COBOL</td>
@@ -500,125 +359,69 @@
                 <td><span class="badge badge-red">Alta</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:54.2%;background:#DC2626"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#DC2626">54.2%</span>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:82.5%;background:#16A34A"></div></div></div>
+                    <span style="font-size:11px;font-weight:700;color:#16A34A">82.5%</span>
                   </div>
                 </td>
-                <td><span class="badge badge-amber">Revisão Pendente</span></td>
+                <td><span class="badge badge-green">Ativo</span></td>
                 <td>Ana Lima</td>
-                <td>28/05/2026</td>
+                <td>13/06/2026</td>
               </tr>
               <tr>
-                <td>BI Tableau Server</td>
-                <td>Analytics</td>
-                <td><span class="badge badge-amber">Média</span></td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:85.7%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">85.7%</span>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">Ativo</span></td>
-                <td>Roberto Silva</td>
-                <td>05/06/2026</td>
-              </tr>
-              <tr>
-                <td>Marketing Hub</td>
-                <td>Marketing</td>
-                <td><span class="badge badge-amber">Média</span></td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:94.4%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">94.4%</span>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">Ativo</span></td>
-                <td>Luciana Barros</td>
-                <td>31/03/2026</td>
-              </tr>
-              <tr>
-                <td>SCM Supply Chain</td>
+                <td>MES Produção</td>
                 <td>Operações</td>
-                <td><span class="badge badge-amber">Média</span></td>
+                <td><span class="badge badge-red">Alta</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:92.4%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">92.4%</span>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:91.6%;background:#16A34A"></div></div></div>
+                    <span style="font-size:11px;font-weight:700;color:#16A34A">91.6%</span>
                   </div>
                 </td>
                 <td><span class="badge badge-green">Ativo</span></td>
                 <td>Pedro Alves</td>
-                <td>09/04/2026</td>
+                <td>13/06/2026</td>
               </tr>
               <tr>
-                <td>PDV Varejo</td>
-                <td>Comercial</td>
-                <td><span class="badge badge-amber">Média</span></td>
+                <td>SuccessFactors RH</td>
+                <td>RH</td>
+                <td><span class="badge badge-red">Alta</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:86.4%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">86.4%</span>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:61.9%;background:#D97706"></div></div></div>
+                    <span style="font-size:11px;font-weight:700;color:#D97706">61.9%</span>
                   </div>
                 </td>
-                <td><span class="badge badge-green">Ativo</span></td>
-                <td>Carlos Mendes</td>
-                <td>07/04/2026</td>
+                <td><span class="badge badge-amber">Revisão Pendente</span></td>
+                <td>Camila Rocha</td>
+                <td>13/06/2026</td>
               </tr>
               <tr>
-                <td>Contabilidade Totvs</td>
+                <td>SAP ERP Central</td>
                 <td>Financeiro</td>
                 <td><span class="badge badge-red">Alta</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:90.5%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">90.5%</span>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:82.2%;background:#16A34A"></div></div></div>
+                    <span style="font-size:11px;font-weight:700;color:#16A34A">82.2%</span>
                   </div>
                 </td>
                 <td><span class="badge badge-green">Ativo</span></td>
                 <td>Ana Lima</td>
-                <td>01/05/2026</td>
+                <td>13/06/2026</td>
               </tr>
               <tr>
-                <td>GRC Compliance</td>
-                <td>Jurídico</td>
+                <td>WMS LogísticaPro</td>
+                <td>Operações</td>
                 <td><span class="badge badge-red">Alta</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:81.2%;background:#16A34A"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#16A34A">81.2%</span>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:89.0%;background:#16A34A"></div></div></div>
+                    <span style="font-size:11px;font-weight:700;color:#16A34A">89.0%</span>
                   </div>
                 </td>
                 <td><span class="badge badge-green">Ativo</span></td>
-                <td>Patricia Alves</td>
-                <td>24/03/2026</td>
-              </tr>
-              <tr>
-                <td>IoT Hub Fábrica</td>
-                <td>Operações</td>
-                <td><span class="badge badge-amber">Média</span></td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:71.6%;background:#D97706"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#D97706">71.6%</span>
-                  </div>
-                </td>
-                <td><span class="badge badge-amber">Revisão Pendente</span></td>
-                <td>Marcelo Costa</td>
-                <td>18/05/2026</td>
-              </tr>
-              <tr>
-                <td>Data Warehouse Legado</td>
-                <td>Analytics</td>
-                <td><span class="badge badge-gray">Baixa</span></td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:57.2%;background:#DC2626"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:#DC2626">57.2%</span>
-                  </div>
-                </td>
-                <td><span class="badge badge-amber">Revisão Pendente</span></td>
-                <td>Roberto Silva</td>
-                <td>01/05/2026</td>
+                <td>Pedro Alves</td>
+                <td>13/06/2026</td>
               </tr>
             </tbody>
           </table>
@@ -626,45 +429,30 @@
       </div>
     </div>
 
-    <!-- PAGE: CONFORMIDADE -->
     <div class="page" id="page-conformidade">
       <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="kpi-card">
-          <div class="kpi-icon">✅</div><div class="kpi-label">Conformes</div>
-          <div class="kpi-value kpi-green">6</div>
-          <div class="kpi-sub kpi-green">40% do total</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon">⚠️</div><div class="kpi-label">Parcialmente Conformes</div>
-          <div class="kpi-value kpi-amber">7</div>
-          <div class="kpi-sub kpi-amber">47% do total</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon">🚨</div><div class="kpi-label">Não Conformes</div>
-          <div class="kpi-value kpi-red">2</div>
-          <div class="kpi-sub kpi-red">13% do total</div>
-        </div>
+        <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-label">Conformes</div><div class="kpi-value kpi-green">3</div><div class="kpi-sub kpi-green">38% do total</div></div>
+        <div class="kpi-card"><div class="kpi-icon">⚠️</div><div class="kpi-label">Parcialmente Conformes</div><div class="kpi-value kpi-amber">4</div><div class="kpi-sub kpi-amber">50% do total</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🚨</div><div class="kpi-label">Não Conformes</div><div class="kpi-value kpi-red">1</div><div class="kpi-sub kpi-red">12% do total</div></div>
       </div>
       <div class="table-card">
         <div class="table-header"><div class="table-title">✅ Avaliação de Conformidade por Sistema</div></div>
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr><th>Sistema</th><th>Domínio</th><th>Score Gov.</th><th>NCs Abertas</th><th>Conformidade</th><th>Data Owner</th><th>Data Steward</th></tr>
-            </thead>
+            <thead><tr><th>Sistema</th><th>Domínio</th><th>Score Gov.</th><th>NCs Abertas</th><th>Conformidade</th><th>Data Owner</th><th>Data Steward</th></tr></thead>
             <tbody>
               
               <tr>
-                <td>SAP ERP Central</td><td>Financeiro</td>
+                <td>BI Tableau Server</td><td>Analytics</td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:88%;background:#16A34A"></div></div></div>
-                    <strong style="color:#16A34A">88%</strong>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:79%;background:#D97706"></div></div></div>
+                    <strong style="color:#D97706">79%</strong>
                   </div>
                 </td>
-                <td><span class="badge badge-amber">2</span></td>
-                <td><span class="badge badge-green">Conforme</span></td>
-                <td>Ana Lima</td><td>João Costa</td>
+                <td><span class="badge badge-amber">1</span></td>
+                <td><span class="badge badge-amber">Parcial</span></td>
+                <td>Roberto Silva</td><td>Fernanda Lima</td>
               </tr>
               <tr>
                 <td>CRM Salesforce</td><td>Comercial</td>
@@ -674,45 +462,9 @@
                     <strong style="color:#D97706">78%</strong>
                   </div>
                 </td>
-                <td><span class="badge badge-green">0</span></td>
+                <td><span class="badge badge-amber">2</span></td>
                 <td><span class="badge badge-amber">Parcial</span></td>
                 <td>Carlos Mendes</td><td>Maria Santos</td>
-              </tr>
-              <tr>
-                <td>WMS LogísticaPro</td><td>Operações</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:73%;background:#D97706"></div></div></div>
-                    <strong style="color:#D97706">73%</strong>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">0</span></td>
-                <td><span class="badge badge-amber">Parcial</span></td>
-                <td>Pedro Alves</td><td>Juliana Ferreira</td>
-              </tr>
-              <tr>
-                <td>MES Produção</td><td>Operações</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:88%;background:#16A34A"></div></div></div>
-                    <strong style="color:#16A34A">88%</strong>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">0</span></td>
-                <td><span class="badge badge-green">Conforme</span></td>
-                <td>Pedro Alves</td><td>Fernanda Lima</td>
-              </tr>
-              <tr>
-                <td>SuccessFactors RH</td><td>RH</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:93%;background:#16A34A"></div></div></div>
-                    <strong style="color:#16A34A">93%</strong>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">0</span></td>
-                <td><span class="badge badge-green">Conforme</span></td>
-                <td>Camila Rocha</td><td>Rafael Oliveira</td>
               </tr>
               <tr>
                 <td>E-commerce Platform</td><td>Comercial</td>
@@ -734,105 +486,57 @@
                     <strong style="color:#DC2626">44%</strong>
                   </div>
                 </td>
-                <td><span class="badge badge-amber">1</span></td>
+                <td><span class="badge badge-red">5</span></td>
                 <td><span class="badge badge-red">Não Conforme</span></td>
                 <td>Ana Lima</td><td>João Costa</td>
               </tr>
               <tr>
-                <td>BI Tableau Server</td><td>Analytics</td>
+                <td>MES Produção</td><td>Operações</td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:79%;background:#D97706"></div></div></div>
-                    <strong style="color:#D97706">79%</strong>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">0</span></td>
-                <td><span class="badge badge-amber">Parcial</span></td>
-                <td>Roberto Silva</td><td>Fernanda Lima</td>
-              </tr>
-              <tr>
-                <td>Marketing Hub</td><td>Marketing</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:71%;background:#D97706"></div></div></div>
-                    <strong style="color:#D97706">71%</strong>
-                  </div>
-                </td>
-                <td><span class="badge badge-amber">1</span></td>
-                <td><span class="badge badge-amber">Parcial</span></td>
-                <td>Luciana Barros</td><td>Thiago Souza</td>
-              </tr>
-              <tr>
-                <td>SCM Supply Chain</td><td>Operações</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:82%;background:#16A34A"></div></div></div>
-                    <strong style="color:#16A34A">82%</strong>
-                  </div>
-                </td>
-                <td><span class="badge badge-amber">1</span></td>
-                <td><span class="badge badge-green">Conforme</span></td>
-                <td>Pedro Alves</td><td>Juliana Ferreira</td>
-              </tr>
-              <tr>
-                <td>PDV Varejo</td><td>Comercial</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:75%;background:#D97706"></div></div></div>
-                    <strong style="color:#D97706">75%</strong>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">0</span></td>
-                <td><span class="badge badge-amber">Parcial</span></td>
-                <td>Carlos Mendes</td><td>Maria Santos</td>
-              </tr>
-              <tr>
-                <td>Contabilidade Totvs</td><td>Financeiro</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:89%;background:#16A34A"></div></div></div>
-                    <strong style="color:#16A34A">89%</strong>
-                  </div>
-                </td>
-                <td><span class="badge badge-amber">1</span></td>
-                <td><span class="badge badge-green">Conforme</span></td>
-                <td>Ana Lima</td><td>João Costa</td>
-              </tr>
-              <tr>
-                <td>GRC Compliance</td><td>Jurídico</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:94%;background:#16A34A"></div></div></div>
-                    <strong style="color:#16A34A">94%</strong>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:88%;background:#16A34A"></div></div></div>
+                    <strong style="color:#16A34A">88%</strong>
                   </div>
                 </td>
                 <td><span class="badge badge-amber">2</span></td>
                 <td><span class="badge badge-green">Conforme</span></td>
-                <td>Patricia Alves</td><td>André Lima</td>
+                <td>Pedro Alves</td><td>Fernanda Lima</td>
               </tr>
               <tr>
-                <td>IoT Hub Fábrica</td><td>Operações</td>
+                <td>SuccessFactors RH</td><td>RH</td>
                 <td>
                   <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:63%;background:#D97706"></div></div></div>
-                    <strong style="color:#D97706">63%</strong>
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:93%;background:#16A34A"></div></div></div>
+                    <strong style="color:#16A34A">93%</strong>
+                  </div>
+                </td>
+                <td><span class="badge badge-green">0</span></td>
+                <td><span class="badge badge-green">Conforme</span></td>
+                <td>Camila Rocha</td><td>Rafael Oliveira</td>
+              </tr>
+              <tr>
+                <td>SAP ERP Central</td><td>Financeiro</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:88%;background:#16A34A"></div></div></div>
+                    <strong style="color:#16A34A">88%</strong>
+                  </div>
+                </td>
+                <td><span class="badge badge-amber">2</span></td>
+                <td><span class="badge badge-green">Conforme</span></td>
+                <td>Ana Lima</td><td>João Costa</td>
+              </tr>
+              <tr>
+                <td>WMS LogísticaPro</td><td>Operações</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:73%;background:#D97706"></div></div></div>
+                    <strong style="color:#D97706">73%</strong>
                   </div>
                 </td>
                 <td><span class="badge badge-amber">1</span></td>
                 <td><span class="badge badge-amber">Parcial</span></td>
-                <td>Marcelo Costa</td><td>Bruno Mendes</td>
-              </tr>
-              <tr>
-                <td>Data Warehouse Legado</td><td>Analytics</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:50%;background:#DC2626"></div></div></div>
-                    <strong style="color:#DC2626">50%</strong>
-                  </div>
-                </td>
-                <td><span class="badge badge-green">0</span></td>
-                <td><span class="badge badge-red">Não Conforme</span></td>
-                <td>Roberto Silva</td><td>Thiago Souza</td>
+                <td>Pedro Alves</td><td>Juliana Ferreira</td>
               </tr>
             </tbody>
           </table>
@@ -840,22 +544,14 @@
       </div>
     </div>
 
-    <!-- PAGE: POR DOMÍNIO -->
     <div class="page" id="page-dominios">
       <div class="charts-grid" style="margin-bottom:24px">
-        <div class="chart-card">
-          <div class="chart-title">Score médio por Domínio</div>
-          <canvas id="chartDominioBar"></canvas>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">Distribuição de Sistemas por Domínio</div>
-          <canvas id="chartDominioPie"></canvas>
-        </div>
+        <div class="chart-card"><div class="chart-title">Score médio por Domínio</div><canvas id="chartDominioBar"></canvas></div>
+        <div class="chart-card"><div class="chart-title">Distribuição de Sistemas por Domínio</div><canvas id="chartDominioPie"></canvas></div>
       </div>
       <div id="dominioCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px"></div>
     </div>
 
-    <!-- PAGE: EVOLUÇÃO -->
     <div class="page" id="page-evolucao">
       <div class="chart-card" style="margin-bottom:20px">
         <div class="chart-title">Evolução do Score por Sistema <span>Jan–Jun/2024</span></div>
@@ -869,29 +565,14 @@
             <tbody>
               
               <tr>
-                <td>SAP ERP Central</td>
-                <td>72%</td><td>75%</td><td>78%</td><td>80%</td><td>83%</td><td>88%</td>
-                <td><span class="badge badge-green">↑ 16pp</span></td>
+                <td>BI Tableau Server</td>
+                <td>70%</td><td>72%</td><td>74%</td><td>75%</td><td>77%</td><td>79%</td>
+                <td><span class="badge badge-green">↑ 9pp</span></td>
               </tr>
               <tr>
                 <td>CRM Salesforce</td>
                 <td>60%</td><td>63%</td><td>68%</td><td>71%</td><td>74%</td><td>78%</td>
                 <td><span class="badge badge-green">↑ 18pp</span></td>
-              </tr>
-              <tr>
-                <td>WMS LogísticaPro</td>
-                <td>55%</td><td>58%</td><td>62%</td><td>66%</td><td>70%</td><td>73%</td>
-                <td><span class="badge badge-green">↑ 18pp</span></td>
-              </tr>
-              <tr>
-                <td>MES Produção</td>
-                <td>80%</td><td>81%</td><td>83%</td><td>85%</td><td>86%</td><td>88%</td>
-                <td><span class="badge badge-green">↑ 8pp</span></td>
-              </tr>
-              <tr>
-                <td>SuccessFactors RH</td>
-                <td>85%</td><td>87%</td><td>88%</td><td>90%</td><td>91%</td><td>93%</td>
-                <td><span class="badge badge-green">↑ 8pp</span></td>
               </tr>
               <tr>
                 <td>E-commerce Platform</td>
@@ -904,44 +585,24 @@
                 <td><span class="badge badge-green">↑ 14pp</span></td>
               </tr>
               <tr>
-                <td>BI Tableau Server</td>
-                <td>70%</td><td>72%</td><td>74%</td><td>75%</td><td>77%</td><td>79%</td>
-                <td><span class="badge badge-green">↑ 9pp</span></td>
+                <td>MES Produção</td>
+                <td>80%</td><td>81%</td><td>83%</td><td>85%</td><td>86%</td><td>88%</td>
+                <td><span class="badge badge-green">↑ 8pp</span></td>
               </tr>
               <tr>
-                <td>Marketing Hub</td>
-                <td>60%</td><td>62%</td><td>64%</td><td>67%</td><td>69%</td><td>71%</td>
-                <td><span class="badge badge-green">↑ 11pp</span></td>
+                <td>SuccessFactors RH</td>
+                <td>85%</td><td>87%</td><td>88%</td><td>90%</td><td>91%</td><td>93%</td>
+                <td><span class="badge badge-green">↑ 8pp</span></td>
               </tr>
               <tr>
-                <td>SCM Supply Chain</td>
-                <td>75%</td><td>76%</td><td>78%</td><td>79%</td><td>80%</td><td>82%</td>
-                <td><span class="badge badge-green">↑ 7pp</span></td>
+                <td>SAP ERP Central</td>
+                <td>72%</td><td>75%</td><td>78%</td><td>80%</td><td>83%</td><td>88%</td>
+                <td><span class="badge badge-green">↑ 16pp</span></td>
               </tr>
               <tr>
-                <td>PDV Varejo</td>
-                <td>68%</td><td>70%</td><td>71%</td><td>73%</td><td>74%</td><td>75%</td>
-                <td><span class="badge badge-green">↑ 7pp</span></td>
-              </tr>
-              <tr>
-                <td>Contabilidade Totvs</td>
-                <td>82%</td><td>83%</td><td>84%</td><td>86%</td><td>87%</td><td>89%</td>
-                <td><span class="badge badge-green">↑ 7pp</span></td>
-              </tr>
-              <tr>
-                <td>GRC Compliance</td>
-                <td>88%</td><td>89%</td><td>90%</td><td>91%</td><td>92%</td><td>94%</td>
-                <td><span class="badge badge-green">↑ 6pp</span></td>
-              </tr>
-              <tr>
-                <td>IoT Hub Fábrica</td>
-                <td>50%</td><td>53%</td><td>56%</td><td>58%</td><td>60%</td><td>63%</td>
-                <td><span class="badge badge-green">↑ 13pp</span></td>
-              </tr>
-              <tr>
-                <td>Data Warehouse Legado</td>
-                <td>40%</td><td>42%</td><td>44%</td><td>46%</td><td>48%</td><td>50%</td>
-                <td><span class="badge badge-green">↑ 10pp</span></td>
+                <td>WMS LogísticaPro</td>
+                <td>55%</td><td>58%</td><td>62%</td><td>66%</td><td>70%</td><td>73%</td>
+                <td><span class="badge badge-green">↑ 18pp</span></td>
               </tr>
             </tbody>
           </table>
@@ -949,30 +610,27 @@
       </div>
     </div>
 
-  </div><!-- /main -->
-</div><!-- /layout -->
+  </div>
+</div>
 
 <script>
-// ── DADOS ────────────────────────────────────────────────────────────────────
-const SISTEMAS   = [{"id": "SAP-ERP-001", "nome": "SAP ERP Central", "tipo": "ERP", "dominio": "Financeiro", "owner": "Ana Lima", "steward": "João Costa", "criticidade": "Alta", "score": 88, "score_hist": [72, 75, 78, 80, 83, 88], "pct_metadados": 83.8, "pct_retencao": 92.6, "nao_conformidades": 2, "status_gov": "Conforme", "status_ret": "Ativo", "data_ultima_revisao": "16/05/2026"}, {"id": "CRM-SF-002", "nome": "CRM Salesforce", "tipo": "CRM", "dominio": "Comercial", "owner": "Carlos Mendes", "steward": "Maria Santos", "criticidade": "Alta", "score": 78, "score_hist": [60, 63, 68, 71, 74, 78], "pct_metadados": 84.2, "pct_retencao": 81.7, "nao_conformidades": 0, "status_gov": "Parcial", "status_ret": "Ativo", "data_ultima_revisao": "08/04/2026"}, {"id": "WMS-LOG-003", "nome": "WMS LogísticaPro", "tipo": "WMS", "dominio": "Operações", "owner": "Pedro Alves", "steward": "Juliana Ferreira", "criticidade": "Alta", "score": 73, "score_hist": [55, 58, 62, 66, 70, 73], "pct_metadados": 91.4, "pct_retencao": 80.5, "nao_conformidades": 0, "status_gov": "Parcial", "status_ret": "Ativo", "data_ultima_revisao": "05/06/2026"}, {"id": "MES-PRD-004", "nome": "MES Produção", "tipo": "MES", "dominio": "Operações", "owner": "Pedro Alves", "steward": "Fernanda Lima", "criticidade": "Alta", "score": 88, "score_hist": [80, 81, 83, 85, 86, 88], "pct_metadados": 85.7, "pct_retencao": 90.2, "nao_conformidades": 0, "status_gov": "Conforme", "status_ret": "Ativo", "data_ultima_revisao": "06/04/2026"}, {"id": "RH-SF-005", "nome": "SuccessFactors RH", "tipo": "ERP", "dominio": "RH", "owner": "Camila Rocha", "steward": "Rafael Oliveira", "criticidade": "Alta", "score": 93, "score_hist": [85, 87, 88, 90, 91, 93], "pct_metadados": 93.5, "pct_retencao": 91.9, "nao_conformidades": 0, "status_gov": "Conforme", "status_ret": "Ativo", "data_ultima_revisao": "24/04/2026"}, {"id": "ECOMM-006", "nome": "E-commerce Platform", "tipo": "Outro", "dominio": "Comercial", "owner": "Bruno Mendes", "steward": "Luciana Barros", "criticidade": "Alta", "score": 72, "score_hist": [65, 64, 66, 68, 70, 72], "pct_metadados": 89.2, "pct_retencao": 84.7, "nao_conformidades": 0, "status_gov": "Parcial", "status_ret": "Ativo", "data_ultima_revisao": "16/06/2026"}, {"id": "FISC-007", "nome": "Legado Fiscal COBOL", "tipo": "Legado", "dominio": "Financeiro", "owner": "Ana Lima", "steward": "João Costa", "criticidade": "Alta", "score": 44, "score_hist": [30, 33, 36, 38, 40, 44], "pct_metadados": 67.5, "pct_retencao": 54.2, "nao_conformidades": 1, "status_gov": "Não Conforme", "status_ret": "Revisão Pendente", "data_ultima_revisao": "28/05/2026"}, {"id": "BI-TAB-008", "nome": "BI Tableau Server", "tipo": "BI", "dominio": "Analytics", "owner": "Roberto Silva", "steward": "Fernanda Lima", "criticidade": "Média", "score": 79, "score_hist": [70, 72, 74, 75, 77, 79], "pct_metadados": 97.3, "pct_retencao": 85.7, "nao_conformidades": 0, "status_gov": "Parcial", "status_ret": "Ativo", "data_ultima_revisao": "05/06/2026"}, {"id": "MKT-HUB-009", "nome": "Marketing Hub", "tipo": "Outro", "dominio": "Marketing", "owner": "Luciana Barros", "steward": "Thiago Souza", "criticidade": "Média", "score": 71, "score_hist": [60, 62, 64, 67, 69, 71], "pct_metadados": 83.5, "pct_retencao": 94.4, "nao_conformidades": 1, "status_gov": "Parcial", "status_ret": "Ativo", "data_ultima_revisao": "31/03/2026"}, {"id": "SCM-010", "nome": "SCM Supply Chain", "tipo": "ERP", "dominio": "Operações", "owner": "Pedro Alves", "steward": "Juliana Ferreira", "criticidade": "Média", "score": 82, "score_hist": [75, 76, 78, 79, 80, 82], "pct_metadados": 94.9, "pct_retencao": 92.4, "nao_conformidades": 1, "status_gov": "Conforme", "status_ret": "Ativo", "data_ultima_revisao": "09/04/2026"}, {"id": "PDV-011", "nome": "PDV Varejo", "tipo": "Outro", "dominio": "Comercial", "owner": "Carlos Mendes", "steward": "Maria Santos", "criticidade": "Média", "score": 75, "score_hist": [68, 70, 71, 73, 74, 75], "pct_metadados": 97.6, "pct_retencao": 86.4, "nao_conformidades": 0, "status_gov": "Parcial", "status_ret": "Ativo", "data_ultima_revisao": "07/04/2026"}, {"id": "CTB-012", "nome": "Contabilidade Totvs", "tipo": "ERP", "dominio": "Financeiro", "owner": "Ana Lima", "steward": "João Costa", "criticidade": "Alta", "score": 89, "score_hist": [82, 83, 84, 86, 87, 89], "pct_metadados": 95.3, "pct_retencao": 90.5, "nao_conformidades": 1, "status_gov": "Conforme", "status_ret": "Ativo", "data_ultima_revisao": "01/05/2026"}, {"id": "GRC-013", "nome": "GRC Compliance", "tipo": "Outro", "dominio": "Jurídico", "owner": "Patricia Alves", "steward": "André Lima", "criticidade": "Alta", "score": 94, "score_hist": [88, 89, 90, 91, 92, 94], "pct_metadados": 85.1, "pct_retencao": 81.2, "nao_conformidades": 2, "status_gov": "Conforme", "status_ret": "Ativo", "data_ultima_revisao": "24/03/2026"}, {"id": "IOT-014", "nome": "IoT Hub Fábrica", "tipo": "Outro", "dominio": "Operações", "owner": "Marcelo Costa", "steward": "Bruno Mendes", "criticidade": "Média", "score": 63, "score_hist": [50, 53, 56, 58, 60, 63], "pct_metadados": 69.3, "pct_retencao": 71.6, "nao_conformidades": 1, "status_gov": "Parcial", "status_ret": "Revisão Pendente", "data_ultima_revisao": "18/05/2026"}, {"id": "DW-015", "nome": "Data Warehouse Legado", "tipo": "Legado", "dominio": "Analytics", "owner": "Roberto Silva", "steward": "Thiago Souza", "criticidade": "Baixa", "score": 50, "score_hist": [40, 42, 44, 46, 48, 50], "pct_metadados": 59.5, "pct_retencao": 57.2, "nao_conformidades": 0, "status_gov": "Não Conforme", "status_ret": "Revisão Pendente", "data_ultima_revisao": "01/05/2026"}];
+const SISTEMAS   = [{"id": "BI-TAB-008", "nome": "BI Tableau Server", "tipo": "BI", "dominio": "Analytics", "owner": "Roberto Silva", "steward": "Fernanda Lima", "criticidade": "Média", "score": 79, "score_hist": [70, 72, 74, 75, 77, 79], "pct_metadados": 91.3, "pct_retencao": 77.0, "nao_conformidades": 1, "status_gov": "Parcial", "status_ret": "Ativo", "data_ultima_revisao": "13/06/2026"}, {"id": "CRM-SF-002", "nome": "CRM Salesforce", "tipo": "CRM", "dominio": "Comercial", "owner": "Carlos Mendes", "steward": "Maria Santos", "criticidade": "Alta", "score": 78, "score_hist": [60, 63, 68, 71, 74, 78], "pct_metadados": 77.2, "pct_retencao": 86.3, "nao_conformidades": 2, "status_gov": "Parcial", "status_ret": "Ativo", "data_ultima_revisao": "13/06/2026"}, {"id": "ECOMM-006", "nome": "E-commerce Platform", "tipo": "Outro", "dominio": "Comercial", "owner": "Bruno Mendes", "steward": "Luciana Barros", "criticidade": "Alta", "score": 72, "score_hist": [65, 64, 66, 68, 70, 72], "pct_metadados": 85.6, "pct_retencao": 69.0, "nao_conformidades": 0, "status_gov": "Parcial", "status_ret": "Revisão Pendente", "data_ultima_revisao": "13/06/2026"}, {"id": "FISC-007", "nome": "Legado Fiscal COBOL", "tipo": "Legado", "dominio": "Financeiro", "owner": "Ana Lima", "steward": "João Costa", "criticidade": "Alta", "score": 44, "score_hist": [30, 33, 36, 38, 40, 44], "pct_metadados": 50.1, "pct_retencao": 82.5, "nao_conformidades": 5, "status_gov": "Não Conforme", "status_ret": "Ativo", "data_ultima_revisao": "13/06/2026"}, {"id": "MES-PRD-004", "nome": "MES Produção", "tipo": "MES", "dominio": "Operações", "owner": "Pedro Alves", "steward": "Fernanda Lima", "criticidade": "Alta", "score": 88, "score_hist": [80, 81, 83, 85, 86, 88], "pct_metadados": 62.1, "pct_retencao": 91.6, "nao_conformidades": 2, "status_gov": "Conforme", "status_ret": "Ativo", "data_ultima_revisao": "13/06/2026"}, {"id": "RH-SF-005", "nome": "SuccessFactors RH", "tipo": "ERP", "dominio": "RH", "owner": "Camila Rocha", "steward": "Rafael Oliveira", "criticidade": "Alta", "score": 93, "score_hist": [85, 87, 88, 90, 91, 93], "pct_metadados": 70.6, "pct_retencao": 61.9, "nao_conformidades": 0, "status_gov": "Conforme", "status_ret": "Revisão Pendente", "data_ultima_revisao": "13/06/2026"}, {"id": "SAP-ERP-001", "nome": "SAP ERP Central", "tipo": "ERP", "dominio": "Financeiro", "owner": "Ana Lima", "steward": "João Costa", "criticidade": "Alta", "score": 88, "score_hist": [72, 75, 78, 80, 83, 88], "pct_metadados": 75.3, "pct_retencao": 82.2, "nao_conformidades": 2, "status_gov": "Conforme", "status_ret": "Ativo", "data_ultima_revisao": "13/06/2026"}, {"id": "WMS-LOG-003", "nome": "WMS LogísticaPro", "tipo": "WMS", "dominio": "Operações", "owner": "Pedro Alves", "steward": "Juliana Ferreira", "criticidade": "Alta", "score": 73, "score_hist": [55, 58, 62, 66, 70, 73], "pct_metadados": 88.5, "pct_retencao": 89.0, "nao_conformidades": 1, "status_gov": "Parcial", "status_ret": "Ativo", "data_ultima_revisao": "13/06/2026"}];
 const MESES      = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"];
-const SCORE_EVO  = [65.3, 67.2, 69.5, 71.5, 73.4, 75.9];
-const DOM_LABELS = ["Financeiro", "Comercial", "Opera\u00e7\u00f5es", "RH", "Analytics", "Marketing", "Jur\u00eddico"];
-const DOM_SCORES = [73.7, 75.0, 76.5, 93.0, 64.5, 71.0, 94.0];
-const DOM_COUNTS = [3, 3, 4, 1, 2, 1, 1];
-const STATUS_DIST = [6, 7, 2];
-const RET_DIST   = [12, 3, 0];
+const SCORE_EVO  = [64.6, 66.6, 69.4, 71.6, 73.9, 76.9];
+const DOM_LABELS = ["Analytics", "Comercial", "Financeiro", "Opera\u00e7\u00f5es", "RH"];
+const DOM_SCORES = [79.0, 75.0, 66.0, 80.5, 93.0];
+const DOM_COUNTS = [1, 2, 2, 2, 1];
+const STATUS_DIST = [3, 4, 1];
+const RET_DIST   = [6, 2, 0];
 
 const COLORS = {
   green:'#16A34A', amber:'#D97706', red:'#DC2626',
   blue:'#2563EB', cyan:'#0891B2', purple:'#7C3AED',
   gray:'#94A3B8', navy:'#0F1E35',
-  lgreenA:'rgba(22,163,74,0.15)', lblueA:'rgba(37,99,235,0.15)',
+  lblueA:'rgba(37,99,235,0.15)',
 };
-
 const PALETTE = ['#2563EB','#0891B2','#16A34A','#D97706','#7C3AED','#DC2626','#0F766E','#9333EA'];
 
-// ── NAVIGATION ───────────────────────────────────────────────────────────────
 function goTo(pageId, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -981,15 +639,9 @@ function goTo(pageId, btn) {
   if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
   if (pageId === 'dominios') renderDominioCards();
 }
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-}
-
-// ── TABLE ────────────────────────────────────────────────────────────────────
-function scoreColor(v) {
-  return v >= 80 ? COLORS.green : v >= 60 ? COLORS.amber : COLORS.red;
-}
+function scoreColor(v) { return v >= 80 ? COLORS.green : v >= 60 ? COLORS.amber : COLORS.red; }
 function statusBadge(s) {
   const map = {'Conforme':'badge-green','Parcial':'badge-amber','Não Conforme':'badge-red'};
   return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
@@ -1033,7 +685,6 @@ function filterTable() {
   renderTable(filtered);
 }
 
-// ── DOMÍNIO CARDS ────────────────────────────────────────────────────────────
 function renderDominioCards() {
   const container = document.getElementById('dominioCards');
   if (container.innerHTML) return;
@@ -1056,113 +707,71 @@ function renderDominioCards() {
   }).join('');
 }
 
-// ── CHARTS ───────────────────────────────────────────────────────────────────
 const chartDefaults = {
   plugins: { legend: { labels: { font: { family:"'Segoe UI',system-ui" }, size:11 } } },
   animation: { duration: 600 },
 };
 
-// Evolução linha
 new Chart(document.getElementById('chartEvo'), {
   type: 'line',
-  data: {
-    labels: MESES,
-    datasets: [{ label:'Índice Geral', data: SCORE_EVO, borderColor: COLORS.blue,
-      backgroundColor: COLORS.lblueA, fill:true, tension:0.4, pointRadius:4,
-      pointBackgroundColor: COLORS.blue }]
-  },
+  data: { labels: MESES, datasets: [{ label:'Índice Geral', data: SCORE_EVO, borderColor: COLORS.blue,
+    backgroundColor: COLORS.lblueA, fill:true, tension:0.4, pointRadius:4, pointBackgroundColor: COLORS.blue }] },
   options: { ...chartDefaults, scales: {
-    y: { min:50, max:100, ticks:{callback:v=>v+'%',font:{size:10}}, grid:{color:'#F1F5F9'} },
-    x: { ticks:{font:{size:10}}, grid:{display:false} }
-  } }
+    y: { min:30, max:100, ticks:{callback:v=>v+'%',font:{size:10}}, grid:{color:'#F1F5F9'} },
+    x: { ticks:{font:{size:10}}, grid:{display:false} } } }
 });
 
-// Status donut
 new Chart(document.getElementById('chartStatus'), {
   type: 'doughnut',
-  data: {
-    labels: ['Conforme','Parcial','Não Conforme'],
-    datasets: [{ data: STATUS_DIST,
-      backgroundColor:[COLORS.green, COLORS.amber, COLORS.red],
-      borderWidth:2, borderColor:'#fff' }]
-  },
+  data: { labels: ['Conforme','Parcial','Não Conforme'], datasets: [{ data: STATUS_DIST,
+    backgroundColor:[COLORS.green, COLORS.amber, COLORS.red], borderWidth:2, borderColor:'#fff' }] },
   options: { ...chartDefaults, cutout:'65%' }
 });
 
-// Retenção donut
 new Chart(document.getElementById('chartRet'), {
   type: 'doughnut',
-  data: {
-    labels: ['Ativo','Revisão Pendente','Vencido'],
-    datasets: [{ data: RET_DIST,
-      backgroundColor:[COLORS.green, COLORS.amber, COLORS.red],
-      borderWidth:2, borderColor:'#fff' }]
-  },
+  data: { labels: ['Ativo','Revisão Pendente','Vencido'], datasets: [{ data: RET_DIST,
+    backgroundColor:[COLORS.green, COLORS.amber, COLORS.red], borderWidth:2, borderColor:'#fff' }] },
   options: { ...chartDefaults, cutout:'65%' }
 });
 
-// Domínio bar horizontal
 new Chart(document.getElementById('chartDominio'), {
   type: 'bar',
-  data: {
-    labels: DOM_LABELS,
-    datasets: [{ label:'Score médio', data: DOM_SCORES,
-      backgroundColor: DOM_SCORES.map(v=>v>=80?COLORS.green:v>=60?COLORS.amber:COLORS.red),
-      borderRadius:6 }]
-  },
+  data: { labels: DOM_LABELS, datasets: [{ label:'Score médio', data: DOM_SCORES,
+    backgroundColor: DOM_SCORES.map(v=>v>=80?COLORS.green:v>=60?COLORS.amber:COLORS.red), borderRadius:6 }] },
   options: { ...chartDefaults, indexAxis:'y',
     scales: { x:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#F1F5F9'}},
               y:{ticks:{font:{size:10}},grid:{display:false}} },
-    plugins:{ ...chartDefaults.plugins, legend:{display:false} }
-  }
+    plugins:{ ...chartDefaults.plugins, legend:{display:false} } }
 });
 
-// Domínio bar (página domínios)
 new Chart(document.getElementById('chartDominioBar'), {
   type: 'bar',
-  data: {
-    labels: DOM_LABELS,
-    datasets: [{ label:'Score médio', data: DOM_SCORES,
-      backgroundColor: PALETTE, borderRadius:6 }]
-  },
+  data: { labels: DOM_LABELS, datasets: [{ label:'Score médio', data: DOM_SCORES,
+    backgroundColor: PALETTE, borderRadius:6 }] },
   options: { ...chartDefaults, scales: {
     y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#F1F5F9'}},
-    x:{ticks:{font:{size:10}},grid:{display:false}}
-  }, plugins:{...chartDefaults.plugins,legend:{display:false}} }
+    x:{ticks:{font:{size:10}},grid:{display:false}} },
+    plugins:{...chartDefaults.plugins,legend:{display:false}} }
 });
 
-// Domínio pie
 new Chart(document.getElementById('chartDominioPie'), {
   type: 'pie',
-  data: {
-    labels: DOM_LABELS,
-    datasets: [{ data: DOM_COUNTS, backgroundColor: PALETTE, borderWidth:2, borderColor:'#fff' }]
-  },
+  data: { labels: DOM_LABELS, datasets: [{ data: DOM_COUNTS, backgroundColor: PALETTE, borderWidth:2, borderColor:'#fff' }] },
   options: { ...chartDefaults }
 });
 
-// Multi-line evolução por sistema
 new Chart(document.getElementById('chartMultiLine'), {
   type: 'line',
-  data: {
-    labels: MESES,
-    datasets: SISTEMAS.slice(0,8).map((s,i) => ({
+  data: { labels: MESES, datasets: SISTEMAS.map((s,i) => ({
       label: s.nome.length>20?s.nome.slice(0,20)+'…':s.nome,
-      data: s.score_hist,
-      borderColor: PALETTE[i % PALETTE.length],
-      backgroundColor: 'transparent',
-      tension: 0.4, pointRadius: 3,
-    }))
-  },
-  options: { ...chartDefaults,
-    scales: {
+      data: s.score_hist, borderColor: PALETTE[i % PALETTE.length],
+      backgroundColor: 'transparent', tension: 0.4, pointRadius: 3, })) },
+  options: { ...chartDefaults, scales: {
       y:{min:20,max:100,ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#F1F5F9'}},
-      x:{ticks:{font:{size:10}},grid:{display:false}}
-    }
-  }
+      x:{ticks:{font:{size:10}},grid:{display:false}} } }
 });
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
 renderTable(SISTEMAS);
 </script>
 </body>
