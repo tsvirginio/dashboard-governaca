@@ -140,7 +140,107 @@ def parse_result_to_dicts(result):
     return sistemas
 
 
-# ── 3. Geração do HTML (mesma lógica usada antes) ────────────────────────────
+# ── 3. Helpers para montar linhas de tabela (fora de f-strings aninhadas) ────
+def cor_por_faixa(v, alto=80, medio=60):
+    if v > alto:
+        return "#16A34A"
+    elif v > medio:
+        return "#D97706"
+    else:
+        return "#DC2626"
+
+
+def badge_criticidade(c):
+    cls = "badge-red" if c == "Alta" else "badge-amber" if c == "Média" else "badge-gray"
+    return f'<span class="badge {cls}">{c}</span>'
+
+
+def badge_status_ret(s):
+    cls = "badge-green" if s == "Ativo" else "badge-amber" if s == "Revisão Pendente" else "badge-red"
+    return f'<span class="badge {cls}">{s}</span>'
+
+
+def badge_nc(n):
+    cls = "badge-red" if n > 2 else "badge-amber" if n > 0 else "badge-green"
+    return f'<span class="badge {cls}">{n}</span>'
+
+
+def badge_status_gov(s):
+    cls = "badge-green" if s == "Conforme" else "badge-amber" if s == "Parcial" else "badge-red"
+    return f'<span class="badge {cls}">{s}</span>'
+
+
+def build_rows_retencao(sistemas):
+    rows = []
+    for s in sistemas:
+        cor = cor_por_faixa(s["pct_retencao"])
+        row = (
+            "<tr>"
+            f"<td>{s['nome']}</td>"
+            f"<td>{s['dominio']}</td>"
+            f"<td>{badge_criticidade(s['criticidade'])}</td>"
+            "<td>"
+            '<div style="display:flex;align-items:center;gap:8px">'
+            '<div class="score-bar-wrap"><div class="score-bar-bg">'
+            f'<div class="score-bar-fill" style="width:{s["pct_retencao"]}%;background:{cor}"></div>'
+            "</div></div>"
+            f'<span style="font-size:11px;font-weight:700;color:{cor}">{s["pct_retencao"]}%</span>'
+            "</div>"
+            "</td>"
+            f"<td>{badge_status_ret(s['status_ret'])}</td>"
+            f"<td>{s['owner']}</td>"
+            f"<td>{s['data_ultima_revisao']}</td>"
+            "</tr>"
+        )
+        rows.append(row)
+    return "".join(rows)
+
+
+def build_rows_conformidade(sistemas):
+    rows = []
+    for s in sistemas:
+        cor = cor_por_faixa(s["score"])
+        row = (
+            "<tr>"
+            f"<td>{s['nome']}</td>"
+            f"<td>{s['dominio']}</td>"
+            "<td>"
+            '<div style="display:flex;align-items:center;gap:8px">'
+            '<div class="score-bar-wrap"><div class="score-bar-bg">'
+            f'<div class="score-bar-fill" style="width:{s["score"]}%;background:{cor}"></div>'
+            "</div></div>"
+            f'<strong style="color:{cor}">{s["score"]}%</strong>'
+            "</div>"
+            "</td>"
+            f"<td>{badge_nc(s['nao_conformidades'])}</td>"
+            f"<td>{badge_status_gov(s['status_gov'])}</td>"
+            f"<td>{s['owner']}</td>"
+            f"<td>{s['steward']}</td>"
+            "</tr>"
+        )
+        rows.append(row)
+    return "".join(rows)
+
+
+def build_rows_evolucao(sistemas):
+    rows = []
+    for s in sistemas:
+        variacao = s["score_hist"][-1] - s["score_hist"][0]
+        cls = "badge-green" if variacao > 0 else "badge-red"
+        seta = "↑" if variacao > 0 else "↓"
+        cols_mes = "".join(f"<td>{v}%</td>" for v in s["score_hist"])
+        row = (
+            "<tr>"
+            f"<td>{s['nome']}</td>"
+            f"{cols_mes}"
+            f'<td><span class="badge {cls}">{seta} {abs(variacao)}pp</span></td>'
+            "</tr>"
+        )
+        rows.append(row)
+    return "".join(rows)
+
+
+# ── 4. Geração do HTML (mesma lógica usada antes) ────────────────────────────
 def build_html(sistemas):
     MESES = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"]
 
@@ -501,21 +601,7 @@ def build_html(sistemas):
           <table>
             <thead><tr><th>Sistema</th><th>Domínio</th><th>Criticidade</th><th>% Dentro Política</th><th>Status Retenção</th><th>Responsável</th><th>Última Revisão</th></tr></thead>
             <tbody>
-              {''.join(f"""
-              <tr>
-                <td>{s['nome']}</td>
-                <td>{s['dominio']}</td>
-                <td><span class="badge {'badge-red' if s['criticidade']=='Alta' else 'badge-amber' if s['criticidade']=='Média' else 'badge-gray'}">{s['criticidade']}</span></td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:{s['pct_retencao']}%;background:{'#16A34A' if s['pct_retencao']>80 else '#D97706' if s['pct_retencao']>60 else '#DC2626'}"></div></div></div>
-                    <span style="font-size:11px;font-weight:700;color:{'#16A34A' if s['pct_retencao']>80 else '#D97706' if s['pct_retencao']>60 else '#DC2626'}">{s['pct_retencao']}%</span>
-                  </div>
-                </td>
-                <td><span class="badge {'badge-green' if s['status_ret']=='Ativo' else 'badge-amber' if s['status_ret']=='Revisão Pendente' else 'badge-red'}">{s['status_ret']}</span></td>
-                <td>{s['owner']}</td>
-                <td>{s['data_ultima_revisao']}</td>
-              </tr>""" for s in sistemas)}
+              {build_rows_retencao(sistemas)}
             </tbody>
           </table>
         </div>
@@ -534,19 +620,7 @@ def build_html(sistemas):
           <table>
             <thead><tr><th>Sistema</th><th>Domínio</th><th>Score Gov.</th><th>NCs Abertas</th><th>Conformidade</th><th>Data Owner</th><th>Data Steward</th></tr></thead>
             <tbody>
-              {''.join(f"""
-              <tr>
-                <td>{s['nome']}</td><td>{s['dominio']}</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill" style="width:{s['score']}%;background:{'#16A34A' if s['score']>=80 else '#D97706' if s['score']>=60 else '#DC2626'}"></div></div></div>
-                    <strong style="color:{'#16A34A' if s['score']>=80 else '#D97706' if s['score']>=60 else '#DC2626'}">{s['score']}%</strong>
-                  </div>
-                </td>
-                <td><span class="badge {'badge-red' if s['nao_conformidades']>2 else 'badge-amber' if s['nao_conformidades']>0 else 'badge-green'}">{s['nao_conformidades']}</span></td>
-                <td><span class="badge {'badge-green' if s['status_gov']=='Conforme' else 'badge-amber' if s['status_gov']=='Parcial' else 'badge-red'}">{s['status_gov']}</span></td>
-                <td>{s['owner']}</td><td>{s['steward']}</td>
-              </tr>""" for s in sistemas)}
+              {build_rows_conformidade(sistemas)}
             </tbody>
           </table>
         </div>
@@ -572,12 +646,7 @@ def build_html(sistemas):
           <table>
             <thead><tr><th>Sistema</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th><th>Variação</th></tr></thead>
             <tbody>
-              {''.join(f"""
-              <tr>
-                <td>{s['nome']}</td>
-                {''.join(f"<td>{v}%</td>" for v in s['score_hist'])}
-                <td><span class="badge {'badge-green' if s['score_hist'][-1]-s['score_hist'][0]>0 else 'badge-red'}">{'↑' if s['score_hist'][-1]-s['score_hist'][0]>0 else '↓'} {abs(s['score_hist'][-1]-s['score_hist'][0])}pp</span></td>
-              </tr>""" for s in sistemas)}
+              {build_rows_evolucao(sistemas)}
             </tbody>
           </table>
         </div>
